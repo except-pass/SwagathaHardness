@@ -1,0 +1,20 @@
+executable: "C:\\Program Files (x86)\\Steam\\steamapps\\common\\MARVEL SNAP\\SNAP.exe"
+buttons:
+    play: 
+      x: 0.75
+      y: 0.80
+      pause: 0.25
+    endturn:
+      x: 0.93
+      y: 0.93
+      pause: 0.25
+    next:
+      x: 0.78
+      y: 0.895
+      pause: 0.25
+
+commands:
+  play_super_good:
+    cycle_end_pause: 2
+  restart_snap:
+    restart_every: 100000
