@@ -3,18 +3,20 @@ buttons:
     play: 
       x: 0.75
       y: 0.80
-      pause: 0.25
+      pause: 0.5
     endturn:
       x: 0.93
       y: 0.93
-      pause: 0.25
+      pause: 0.5
     next:
-      x: 0.78
-      y: 0.895
-      pause: 0.25
+      x: 0.8
+      y: 0.93
+      pause: 0.5
 
 commands:
   play_super_good:
-    cycle_end_pause: 2
+    cycle_end_pause: 3.5
   restart_snap:
-    restart_every: 100000
+    restart_every: 500
+  parse_log_files:
+    path_to_log_files: "~\\AppData\\LocalLow\\Second Dinner\\SNAP\\Standalone\\States\\nvprod"

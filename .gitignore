@@ -1,3 +1,5 @@
 .venv
 calibration_images/
 tt_net_config.config
+__pycache__/
+gamestates/

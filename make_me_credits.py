@@ -5,6 +5,7 @@ import time     # For pause
 import datetime # for timestamps
 import subprocess #to open and close the client
 import mouse    # mouse, duh
+import yaml
 
 logger = logging.getLogger()
 
@@ -94,10 +95,10 @@ class Agatha:
         function_configs = self.get_function_configs('play_super_good')
         cycle_end_pause = function_configs.get('cycle_end_pause', 2)
 
-
-        self.screen.play.click(screensize=self.screen.size)
         self.screen.endturn.click(screensize=self.screen.size)
         self.screen.next.click(screensize=self.screen.size)
+        self.screen.play.click(screensize=self.screen.size)
+
         time.sleep(cycle_end_pause)
 
     def restart_snap(self):
@@ -121,11 +122,14 @@ class Agatha:
 
             self.restart_snap()
             time.sleep(1)
-            #self.play_super_good()
+            self.play_super_good()
 
+def load_config_file(config_fpath):
+    with open(config_fpath, 'r') as f:
+        return yaml.safe_load(f)
+    
 if __name__ == '__main__':
     import argparse
-    import yaml
     logging.basicConfig(format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')        
     logger.setLevel(logging.DEBUG)
 
@@ -136,11 +140,13 @@ if __name__ == '__main__':
 
     parser.add_argument("configs", type=str, help="Filepath to yaml config file")
     parser.add_argument("-n", type=int, help="Number of cycles to run before quitting.  Default: never stop", default=None)
-
+    parser.add_argument("--no_start_client", action='store_true', default=False)
+    parser.add_argument('--testing_mode', action='store_true', default=False, help="Start in a testing mode with a debug terminal")
     args = parser.parse_args()
-    config_fpath = args.configs
-    with open(config_fpath, 'r') as f:
-        configs = yaml.safe_load(f)
+    configs = load_config_file(args.configs)
 
-    my_girlfriend = Agatha(configs=configs)
-    my_girlfriend.get_me_credits()
+    my_girlfriend = Agatha(configs=configs, start_client=(not args.no_start_client))
+    aga = my_girlfriend #shorter typing for testing mode
+    if not args.testing_mode:
+        my_girlfriend.get_me_credits()
+    
