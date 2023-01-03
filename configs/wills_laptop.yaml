@@ -15,8 +15,9 @@ buttons:
 
 commands:
   play_super_good:
-    cycle_end_pause: 3.5
+    cycle_end_pause: 3.5 #seconds
   restart_snap:
-    restart_every: 500
-  parse_log_files:
+    restart_every: 100  #cycles
+  save_state_files:
+    save_every: 50 #cycles
     path_to_log_files: "~\\AppData\\LocalLow\\Second Dinner\\SNAP\\Standalone\\States\\nvprod"

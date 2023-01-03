@@ -6,6 +6,8 @@ import datetime # for timestamps
 import subprocess #to open and close the client
 import mouse    # mouse, duh
 import yaml
+import shutil
+import pathlib
 
 logger = logging.getLogger()
 
@@ -18,8 +20,10 @@ class SnapClient:
         self.process = subprocess.Popen(self.executable)
     def stop(self):
         logger.info("Stopping Snap Client")
-        self.process.terminate()
-
+        try:
+            self.process.terminate()
+        except AttributeError:
+            logger.error("Snap was not started by this program.")
 
 @dataclass
 class Location:
@@ -87,11 +91,13 @@ class Agatha:
                 next = Button(**button_defs['next']),
                 )
 
-
     def get_function_configs(self, function_name):
         return self.configs['commands'].get(function_name, {})
 
     def play_super_good(self):
+        '''
+        Run a series of clicks, then pause for "cycle_end_pause" seconds at the end
+        '''
         function_configs = self.get_function_configs('play_super_good')
         cycle_end_pause = function_configs.get('cycle_end_pause', 2)
 
@@ -100,6 +106,20 @@ class Agatha:
         self.screen.play.click(screensize=self.screen.size)
 
         time.sleep(cycle_end_pause)
+
+    def save_state_files(self):
+        configs = self.get_function_configs('save_state_files')
+        save_every = configs.get('save_every')
+        fpath = configs.get('path_to_log_files')   
+
+        if save_every is None:
+            return None
+
+        if self.counter % save_every == 0 :
+            logfiles = pathlib.Path(fpath).expanduser()
+            dest = gamestates_dest_directory()
+            logger.info("Saving the log files to {}".format(dest))
+            shutil.copytree(logfiles, dest)
 
     def restart_snap(self):
         function_configs = self.get_function_configs('restart_snap')
@@ -121,13 +141,24 @@ class Agatha:
             logger.info("Playing cycle {}".format(self.counter))
 
             self.restart_snap()
-            time.sleep(1)
             self.play_super_good()
+            self.save_state_files()
 
 def load_config_file(config_fpath):
     with open(config_fpath, 'r') as f:
         return yaml.safe_load(f)
-    
+
+def gamestates_dest_directory():
+    try: 
+        this = pathlib.Path(__file__).parent.resolve()
+    except NameError:
+        #in a notebook
+        this = globals()['_dh'][0]
+
+    now = int(time.time())
+    dest = this.joinpath('gamestates', str(now))
+    return dest
+
 if __name__ == '__main__':
     import argparse
     logging.basicConfig(format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')        
